@@ -9,7 +9,7 @@ class RoomRepository {
   final ApiConfig _apiConfig = ApiConfig();
 
   Future<List<User>> getAllUsers() async {
-    final response = await _httpClient.delete(
+    final response = await _httpClient.get(
       _apiConfig.getResourceUri("users"),
       headers: {
         'Authorization': "Bearer <token>"
@@ -23,7 +23,7 @@ class RoomRepository {
   }
 
   Future<User> getUser(int id) async {
-    final response = await _httpClient.delete(
+    final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("users", id.toString()),
       headers: {
         'Authorization': "Bearer <token>"

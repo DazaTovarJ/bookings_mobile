@@ -56,7 +56,7 @@ class BookingsRepository {
   }
 
   Future<List<Booking>> getAllBookings() async {
-    final response = await _httpClient.delete(
+    final response = await _httpClient.get(
       _apiConfig.getResourceUri("bookings"),
       headers: {
         'Authorization': "Bearer <token>"
@@ -70,7 +70,7 @@ class BookingsRepository {
   }
 
   Future<Booking> getBooking(int id) async {
-    final response = await _httpClient.delete(
+    final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("bookings", id.toString()),
       headers: {
         'Authorization': "Bearer <token>"
