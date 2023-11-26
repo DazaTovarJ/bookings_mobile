@@ -1,3 +1,4 @@
+import 'package:bookings_app/features/rooms/pages/create_room.dart';
 import 'package:flutter/material.dart';
 
 class RoomsPage extends StatefulWidget {
@@ -46,7 +47,12 @@ class _RoomsPageState extends State<RoomsPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreateRoomPage()),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );
