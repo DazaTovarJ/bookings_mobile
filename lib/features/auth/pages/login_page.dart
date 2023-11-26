@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:bookings_app/shared/main_layout.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -130,7 +131,14 @@ class _LoginPageState extends State<LoginPage> {
                                 FadeInUp(
                                   duration: const Duration(milliseconds: 1600),
                                   child: MaterialButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const MainLayout(),
+                                        ),
+                                      );
+                                    },
                                     height: 50,
                                     color: Colors.purple[900],
                                     shape: RoundedRectangleBorder(
