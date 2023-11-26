@@ -25,14 +25,14 @@ class _MainLayoutState extends State<MainLayout> {
             itemBuilder: (context) {
               return [
                 const PopupMenuItem(
-                    value: 'profile',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person),
-                        SizedBox(width: 10),
-                        Text('Perfil'),
-                      ],
-                    ),
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person),
+                      SizedBox(width: 10),
+                      Text('Perfil'),
+                    ],
+                  ),
                 ),
                 const PopupMenuItem(
                   value: 'logout',
