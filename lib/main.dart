@@ -1,5 +1,7 @@
-import 'package:bookings_app/features/auth/pages/login_page.dart';
+import 'package:bookings_app/auth_check.dart';
+import 'package:bookings_app/shared/auth_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,11 +34,18 @@ class MyApp extends StatelessWidget {
       useMaterial3: true,
     );*/
 
-    return MaterialApp(
-      title: 'Bookings App',
-      debugShowCheckedModeBanner: false,
-      theme: appTheme,
-      home: const LoginPage(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<UserCubit>(
+          create: (context) => UserCubit(null),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Bookings App',
+        debugShowCheckedModeBanner: false,
+        theme: appTheme,
+        home: const LoginCheck(),
+      ),
     );
   }
 }

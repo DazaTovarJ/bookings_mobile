@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bookings_app/shared/api_config.dart';
 import 'package:http/http.dart';
 
@@ -5,7 +7,7 @@ class AuthRepository {
   final Client _httpClient = Client();
   final ApiConfig _apiConfig = ApiConfig();
 
-  Future<void> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final response = await _httpClient.post(
       _apiConfig.getAuthActionUri('login'),
       body: {
@@ -14,11 +16,7 @@ class AuthRepository {
       },
     );
 
-    if (response.statusCode == 200) {
-      print('Login successful');
-    } else {
-      throw Exception('Failed to login');
-    }
+    return json.decode(response.body) as Map<String, dynamic>;
   }
 
   Future<void> register(String firstName, String lastName, String email, String password) async {
