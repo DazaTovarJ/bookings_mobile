@@ -14,9 +14,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
+  bool obscurePass = true;
+
   final AuthenticationService _authService = AuthenticationService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -82,94 +86,146 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(30),
-                          child: Column(
-                            children: <Widget>[
-                              const SizedBox(height: 60),
-                              FadeInUp(
-                                duration: const Duration(microseconds: 1400),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color.fromARGB(224, 69, 3, 95),
-                                        blurRadius: 20,
-                                        offset: Offset(0, 10),
-                                      )
-                                    ],
-                                  ),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey.shade200,
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: <Widget>[
+                                const SizedBox(height: 60),
+                                FadeInUp(
+                                  duration: const Duration(microseconds: 1400),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color.fromARGB(224, 69, 3, 95),
+                                          blurRadius: 20,
+                                          offset: Offset(0, 10),
+                                        )
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey.shade200,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: TextField(
-                                          controller: _emailController,
-                                          decoration: const InputDecoration(
-                                            hintText: "Ingrese Usuario",
-                                            hintStyle: TextStyle(
-                                              color: Colors.grey,
+                                          child: TextFormField(
+                                            controller: _emailController,
+                                            keyboardType:
+                                                TextInputType.emailAddress,
+                                            decoration: InputDecoration(
+                                              hintText: "Ingrese Usuario",
+                                              hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                              border: InputBorder.none,
+                                              prefixIcon: Icon(
+                                                Icons.email,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
                                             ),
-                                            border: InputBorder.none,
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Ingrese un usuario';
+                                              }
+                                              return null;
+                                            },
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey.shade200,
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey.shade200,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: TextField(
-                                          controller: _passwordController,
-                                          obscureText: true,
-                                          decoration: const InputDecoration(
-                                            hintText: "Ingrese Contraseña",
-                                            hintStyle: TextStyle(
-                                              color: Colors.grey,
+                                          child: TextFormField(
+                                            controller: _passwordController,
+                                            obscureText: obscurePass,
+                                            decoration: InputDecoration(
+                                              hintText: "Ingrese Contraseña",
+                                              hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                              ),
+                                              border: InputBorder.none,
+                                              prefixIcon: Icon(
+                                                Icons.key,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                              suffixIcon: IconButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    obscurePass = !obscurePass;
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                  !obscurePass
+                                                      ? Icons.visibility
+                                                      : Icons.visibility_off,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                              ),
                                             ),
-                                            border: InputBorder.none,
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'Ingrese una contraseña';
+                                              }
+                                              return null;
+                                            },
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 40),
-                              FadeInUp(
-                                duration: const Duration(milliseconds: 1600),
-                                child: MaterialButton(
-                                  onPressed: () {
-                                    _login();
-                                  },
-                                  height: 50,
-                                  color: Colors.purple[900],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: const Center(
-                                    child: Text(
-                                      "Login",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
+                                const SizedBox(height: 40),
+                                FadeInUp(
+                                  duration: const Duration(milliseconds: 1600),
+                                  child: FilledButton(
+                                    onPressed: _isLoading
+                                        ? null
+                                        : () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              setState(() {
+                                                _isLoading = true;
+                                              });
+                                              _login().then((value) {
+                                                setState(() {
+                                                  _isLoading = false;
+                                                });
+                                              });
+                                            }
+                                          },
+                                    child: const Center(
+                                      child: Text(
+                                        "Login",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -182,6 +238,13 @@ class _LoginPageState extends State<LoginPage> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   Future<void> _login() async {

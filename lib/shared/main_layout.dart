@@ -44,7 +44,6 @@ class _MainLayoutState extends State<MainLayout> {
           return Scaffold(
             appBar: AppBar(
               title: const Text('Sistema de Reservas de Habitaciones'),
-              automaticallyImplyLeading: false,
               actions: [
                 PopupMenuButton(
                   icon: const Icon(Icons.account_circle),
