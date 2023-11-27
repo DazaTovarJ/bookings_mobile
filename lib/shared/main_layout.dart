@@ -17,7 +17,7 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   late int _currentPage;
-  late final _pageController;
+  late final PageController _pageController;
   final AuthenticationService _authService = AuthenticationService();
 
   void _logout() async {
