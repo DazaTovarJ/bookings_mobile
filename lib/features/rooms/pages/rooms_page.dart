@@ -16,6 +16,79 @@ class _RoomsPageState extends State<RoomsPage> {
 
   late Future<List<Room>> _rooms;
 
+  void _showDeleteConfirmationAlert(Room room) {
+    var theme = Theme.of(context);
+
+    Widget yesButton = TextButton(
+      onPressed: () {
+        deleteRoom(room.id!).then((value) {
+          setState(() {
+            _rooms = _roomService.getRooms();
+          });
+        });
+        Navigator.pop(context);
+      },
+      child: const Text("Sí"),
+    );
+    Widget noButton = TextButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      child: const Text("No"),
+    );
+
+    AlertDialog dialog = AlertDialog(
+      backgroundColor: theme.colorScheme.errorContainer,
+      title: const Text("Eliminación de habitación"),
+      content: Text("¿Está seguro que desea eliminar la habitación ${room.roomNumber}?"),
+      actions: [
+        yesButton,
+        noButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return dialog;
+      },
+    );
+  }
+
+  Future<void> deleteRoom(int id) async {
+    try {
+      final response = await _roomService.deleteRoom(id);
+
+      _showDialog(response["message"], response["code"] == 200 ? "success" : "error");
+    } catch (e) {
+      _showDialog("Error al eliminar la habitación", "error");
+    }
+  }
+
+  _showDialog(String message, String type) {
+    var theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(type == 'error' ? 'Error' : 'Éxito'),
+          backgroundColor: type == 'error'
+              ? theme.colorScheme.errorContainer
+              : theme.dialogTheme.backgroundColor,
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -70,7 +143,9 @@ class _RoomsPageState extends State<RoomsPage> {
                           child: const Text('Editar'),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _showDeleteConfirmationAlert(room);
+                          },
                           child: const Text('Eliminar'),
                         ),
                       ],
