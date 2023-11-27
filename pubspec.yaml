@@ -39,6 +39,8 @@ dependencies:
   animate_do: ^3.1.2
   shared_preferences: ^2.2.2
   flutter_bloc: ^8.1.3
+  material_symbols_icons: ^4.2711.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
