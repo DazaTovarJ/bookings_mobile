@@ -38,8 +38,9 @@ class _MainLayoutState extends State<MainLayout> {
         buildWhen: (previous, current) => previous != current,
         builder: (context, state) {
           if (state == null) {
-            _authService.checkSharedPrefs().then(
-                (user) => BlocProvider.of<UserCubit>(context).login(user));
+            _authService.checkSharedPrefs().then((user) {
+              BlocProvider.of<UserCubit>(context).login(user);
+            });
           }
           return Scaffold(
             appBar: AppBar(

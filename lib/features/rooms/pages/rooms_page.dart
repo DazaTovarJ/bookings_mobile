@@ -1,3 +1,5 @@
+import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
+import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/features/rooms/pages/create_room.dart';
 import 'package:flutter/material.dart';
 
@@ -9,42 +11,68 @@ class RoomsPage extends StatefulWidget {
 }
 
 class _RoomsPageState extends State<RoomsPage> {
+  final RoomService _roomService = RoomService();
+
+  late Future<List<Room>> _rooms;
+
+  @override
+  void initState() {
+    super.initState();
+    _rooms = _roomService.getRooms();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Column(
-                    children: [
-                      const Icon(Icons.hotel),
-                      Text("E${index + 1}"),
-                    ],
-                  ),
-                  title: Text('Habitación ${index + 1}'),
-                  subtitle: Text('Descripción de la habitación ${index + 1}'),
-                  trailing: const Text("S/. 100.00"),
-                ),
-                ButtonBar(
+      body: FutureBuilder(
+        future: _rooms,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            print(snapshot.error);
+            return const Center(child: Text('Error al obtener las habitaciones'));
+          }
+
+          var rooms = snapshot.data;
+          return ListView.builder(
+            itemCount: rooms!.length,
+            itemBuilder: (context, index) {
+              var room = rooms[index];
+              return Card(
+                child: Column(
                   children: [
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('Editar'),
+                    ListTile(
+                      leading: Column(
+                        children: [
+                          const Icon(Icons.hotel),
+                          Text(room.roomNumber),
+                        ],
+                      ),
+                      title: Text("Habitación ${room.roomNumber}"),
+                      subtitle: Text('Clase: ${room.type}'),
+                      trailing: Text("\$${room.value}"),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text('Eliminar'),
+                    ButtonBar(
+                      children: [
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text('Editar'),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text('Eliminar'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              );
+            },
           );
-        },
+        }
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

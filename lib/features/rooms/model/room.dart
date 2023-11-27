@@ -16,7 +16,7 @@ class Room {
       id: json['id'],
       roomNumber: json['room_number'],
       type: json['room_type'],
-      value: json['room_value'],
+      value: double.parse(json['room_value']),
     );
   }
 

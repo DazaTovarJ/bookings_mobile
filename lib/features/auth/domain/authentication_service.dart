@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthenticationService {
   final AuthRepository _authRepository = AuthRepository();
   final UserRepository _userRepository = UserRepository();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     return await _authRepository.login(email, password);
@@ -20,9 +21,11 @@ class AuthenticationService {
   }
 
   Future<User> checkSharedPrefs() async {
-    var prefs = await SharedPreferences.getInstance();
+    var prefs = await _prefs;
+    await prefs.reload();
     var token = prefs.getString('token');
     var userId = prefs.getInt('id') ?? 0;
+    print("Saved: $token");
     if ((token == null || token.isEmpty) || userId == 0)  {
       return Future.error("No credentials found");
     }
@@ -35,14 +38,20 @@ class AuthenticationService {
   }
 
   Future<void> updateSharedPrefs(String token, int id) async {
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setString('token', token);
-    prefs.setInt('id', id);
+    var prefs = await _prefs;
+
+    await prefs.clear();
+    await prefs.setString('token', token);
+    await prefs.setInt('id', id);
+
+    print("Saved: ${prefs.getString("token")}");
   }
 
   Future<void> logout() async {
-    var prefs = await SharedPreferences.getInstance();
-    prefs.remove('token');
-    prefs.remove('id');
+    var prefs = await _prefs;
+
+    await prefs.reload();
+    await prefs.remove('token');
+    await prefs.remove('id');
   }
 }
