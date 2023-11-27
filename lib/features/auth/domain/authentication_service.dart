@@ -25,7 +25,6 @@ class AuthenticationService {
     await prefs.reload();
     var token = prefs.getString('token');
     var userId = prefs.getInt('id') ?? 0;
-    print("Saved: $token");
     if ((token == null || token.isEmpty) || userId == 0)  {
       return Future.error("No credentials found");
     }
