@@ -10,6 +10,10 @@ class CreateRoomPage extends StatefulWidget {
 class _CreateRoomPageState extends State<CreateRoomPage> {
   final _formKey = GlobalKey<FormState>();
 
+  final _roomNumberController = TextEditingController();
+  final _roomTypeController = TextEditingController();
+  final _roomValueController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +29,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                 padding: const EdgeInsets.all(20),
                 children: [
                   TextFormField(
+                    controller: _roomNumberController,
                     decoration: const InputDecoration(
                       labelText: 'Número de habitación',
                     ),
@@ -36,6 +41,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                     },
                   ),
                   TextFormField(
+                    controller: _roomTypeController,
                     decoration: const InputDecoration(
                       labelText: 'Tipo de habitación',
                     ),
@@ -47,6 +53,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                     },
                   ),
                   TextFormField(
+                    controller: _roomValueController,
                     decoration: const InputDecoration(
                       labelText: 'Precio',
                     ),
@@ -86,5 +93,13 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _roomNumberController.dispose();
+    _roomTypeController.dispose();
+    _roomValueController.dispose();
+    super.dispose();
   }
 }

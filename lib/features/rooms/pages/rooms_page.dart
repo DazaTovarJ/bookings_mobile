@@ -1,6 +1,7 @@
 import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
 import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/features/rooms/pages/create_room.dart';
+import 'package:bookings_app/features/rooms/pages/edit_room.dart';
 import 'package:flutter/material.dart';
 
 class RoomsPage extends StatefulWidget {
@@ -58,7 +59,14 @@ class _RoomsPageState extends State<RoomsPage> {
                     ButtonBar(
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditRoomPage(room: room),
+                              ),
+                            );
+                          },
                           child: const Text('Editar'),
                         ),
                         TextButton(
