@@ -33,6 +33,7 @@ class RoomRepository {
   }
 
   Future<Room> getRoom(int id) async {
+    await _getCredentials();
     final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("rooms", id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},
@@ -45,6 +46,7 @@ class RoomRepository {
   }
 
   Future<Map<String, dynamic>> createRoom(Room room) async {
+    await _getCredentials();
     final response = await _httpClient.post(
       _apiConfig.getResourceUri('rooms'),
       headers: {'Authorization': "Bearer $_accessToken"},
@@ -59,6 +61,7 @@ class RoomRepository {
   }
 
   Future<Map<String, dynamic>> updateRoom(Room room) async {
+    await _getCredentials();
     final response = await _httpClient.patch(
       _apiConfig.getUniqueResourceUri('rooms', room.id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},
@@ -73,6 +76,7 @@ class RoomRepository {
   }
 
   Future<Map<String, dynamic>> deleteRoom(int id) async {
+    await _getCredentials();
     final response = await _httpClient.delete(
       _apiConfig.getUniqueResourceUri("rooms", id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},

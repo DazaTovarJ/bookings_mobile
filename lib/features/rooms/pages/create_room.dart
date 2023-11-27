@@ -1,3 +1,6 @@
+import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
+import 'package:bookings_app/features/rooms/model/room.dart';
+import 'package:bookings_app/shared/main_layout.dart';
 import 'package:flutter/material.dart';
 
 class CreateRoomPage extends StatefulWidget {
@@ -8,11 +11,68 @@ class CreateRoomPage extends StatefulWidget {
 }
 
 class _CreateRoomPageState extends State<CreateRoomPage> {
+  final RoomService _roomService = RoomService();
+
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   final _roomNumberController = TextEditingController();
   final _roomTypeController = TextEditingController();
   final _roomValueController = TextEditingController();
+
+  Future<void> _saveRoom() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      Room room = Room(
+        roomNumber: _roomNumberController.text,
+        type: _roomTypeController.text,
+        value: double.parse(_roomValueController.text),
+      );
+
+      var response = await _roomService.createRoom(room);
+
+      _showDialog(
+        response["message"],
+        response["code"] == 201 ? "success" : "error",
+      );
+    }
+  }
+
+  _showDialog(String message, String type) {
+    var theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(type == 'error' ? 'Error' : 'Éxito'),
+          backgroundColor: type == 'error'
+              ? theme.colorScheme.errorContainer
+              : theme.dialogTheme.backgroundColor,
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                type == "success"
+                    ? Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MainLayout(
+                            initialPage: 1,
+                          ),
+                        ),
+                        (route) => false)
+                    : Navigator.pop(context);
+              },
+              child: const Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +107,7 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese la descripción de la habitación';
+                        return 'Por favor ingrese el tipo de la habitación';
                       }
                       return null;
                     },
@@ -80,13 +140,20 @@ class _CreateRoomPageState extends State<CreateRoomPage> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: FilledButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Procesando datos')),
-                  );
-                }
-              },
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        _saveRoom().then((value) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        });
+                      }
+                    },
               child: const Text('Guardar'),
             ),
           ),

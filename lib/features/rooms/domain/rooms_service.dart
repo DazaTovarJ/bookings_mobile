@@ -7,4 +7,20 @@ class RoomService {
   Future<List<Room>> getRooms() async {
     return await _roomRepository.getAllRooms();
   }
+
+  Future<Room> getRoom(int id) async {
+    return await _roomRepository.getRoom(id);
+  }
+
+  Future<Map<String, dynamic>> createRoom(Room room) async {
+    return await _roomRepository.createRoom(room);
+  }
+
+  Future<Map<String, dynamic>> updateRoom(Room room) async {
+    return await _roomRepository.updateRoom(room);
+  }
+
+  Future<Map<String, dynamic>> deleteRoom(int id) async {
+    return await _roomRepository.deleteRoom(id);
+  }
 }
