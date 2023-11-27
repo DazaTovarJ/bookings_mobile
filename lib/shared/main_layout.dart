@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key, this.initialPage = 0});
+
   final int initialPage;
 
   @override
@@ -43,77 +44,78 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<UserCubit, User?>(
-        buildWhen: (previous, current) => previous != current,
-        builder: (context, state) {
-          if (state == null) {
-            _authService.checkSharedPrefs().then((user) {
-              BlocProvider.of<UserCubit>(context).login(user);
-            });
-          }
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Sistema de Reservas de Habitaciones'),
-              actions: [
-                PopupMenuButton(
-                  icon: const Icon(Icons.account_circle),
-                  itemBuilder: (context) {
-                    return [
-                      const PopupMenuItem(
-                        value: 'profile',
-                        child: Row(
-                          children: [
-                            Icon(Icons.person),
-                            SizedBox(width: 10),
-                            Text('Perfil'),
-                          ],
-                        ),
+      buildWhen: (previous, current) => previous != current,
+      builder: (context, state) {
+        if (state == null) {
+          _authService.checkSharedPrefs().then((user) {
+            BlocProvider.of<UserCubit>(context).login(user);
+          });
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Sistema de Reservas de Habitaciones'),
+            actions: [
+              PopupMenuButton(
+                icon: const Icon(Icons.account_circle),
+                itemBuilder: (context) {
+                  return [
+                    const PopupMenuItem(
+                      value: 'profile',
+                      child: Row(
+                        children: [
+                          Icon(Icons.person),
+                          SizedBox(width: 10),
+                          Text('Perfil'),
+                        ],
                       ),
-                      PopupMenuItem(
-                        value: 'logout',
-                        onTap: () => _logout(),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.exit_to_app),
-                            SizedBox(width: 10),
-                            Text('Cerrar sesión'),
-                          ],
-                        ),
+                    ),
+                    PopupMenuItem(
+                      value: 'logout',
+                      onTap: () => _logout(),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.exit_to_app),
+                          SizedBox(width: 10),
+                          Text('Cerrar sesión'),
+                        ],
                       ),
-                    ];
-                  },
-                ),
-              ],
-            ),
-            body: PageView(
-              controller: _pageController,
-              onPageChanged: (page) => setState(() => _currentPage = page),
-              children: const [
-                BookingsPage(),
-                RoomsPage(),
-              ],
-            ),
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: _currentPage,
-              onDestinationSelected: (page) {
-                setState(() {
-                  _currentPage = page;
-                  _pageController.animateToPage(page,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut);
-                });
-              },
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.calendar_today),
-                  label: 'Reservas',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.hotel),
-                  label: 'Habitaciones',
-                ),
-              ],
-            ),
-          );
-        });
+                    ),
+                  ];
+                },
+              ),
+            ],
+          ),
+          body: PageView(
+            controller: _pageController,
+            onPageChanged: (page) => setState(() => _currentPage = page),
+            children: const [
+              BookingsPage(),
+              RoomsPage(),
+            ],
+          ),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _currentPage,
+            onDestinationSelected: (page) {
+              setState(() {
+                _currentPage = page;
+                _pageController.animateToPage(page,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut);
+              });
+            },
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.calendar_today),
+                label: 'Reservas',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.hotel),
+                label: 'Habitaciones',
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
