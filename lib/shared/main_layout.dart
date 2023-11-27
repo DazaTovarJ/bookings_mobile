@@ -8,15 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainLayout extends StatefulWidget {
-  const MainLayout({super.key});
+  const MainLayout({super.key, this.initialPage = 0});
+  final int initialPage;
 
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  int _currentPage = 0;
-  final _pageController = PageController();
+  late int _currentPage;
+  late final _pageController;
   final AuthenticationService _authService = AuthenticationService();
 
   void _logout() async {
@@ -30,6 +31,13 @@ class _MainLayoutState extends State<MainLayout> {
         builder: (context) => const LoginPage(),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.initialPage;
+    _pageController = PageController(initialPage: widget.initialPage);
   }
 
   @override
@@ -88,7 +96,10 @@ class _MainLayoutState extends State<MainLayout> {
               selectedIndex: _currentPage,
               onDestinationSelected: (page) {
                 setState(() {
-                  _pageController.jumpToPage(page);
+                  _currentPage = page;
+                  _pageController.animateToPage(page,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut);
                 });
               },
               destinations: const [
