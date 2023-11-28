@@ -36,11 +36,7 @@ class _LoginCheckState extends State<LoginCheck> {
           builder: (context) => const MainLayout(),
         ),
       );
-    } on Exception catch(e, s) {
-      print(s);
-      showLogoutNotification(context, false);
-    } catch (e, s) {
-      print(s);
+    } catch (e) {
       showLogoutNotification(context, false);
     }
   }
@@ -50,10 +46,10 @@ class _LoginCheckState extends State<LoginCheck> {
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
-  Widget showLogoutNotification(BuildContext context, bool effectiveLogout) =>
+  void showLogoutNotification(BuildContext context, bool effectiveLogout) =>
       _showNotification(context, 'Sesión Cerrada', 'Su sesión ha sido cerrada', effectiveLogout);
 
-  Widget _showNotification(
+  void _showNotification(
       BuildContext context, String title, String message, bool effectiveLogout) {
     AlertDialog dialog = AlertDialog(
       title: Text(title),
@@ -77,6 +73,6 @@ class _LoginCheckState extends State<LoginCheck> {
       ],
     );
 
-    return dialog;
+    showDialog(context: context, builder: (context) => dialog);
   }
 }

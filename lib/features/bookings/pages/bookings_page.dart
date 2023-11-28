@@ -110,12 +110,14 @@ class _BookingsPageState extends State<BookingsPage> {
             var response = snapshot.data!;
 
             if (response.code == 401) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginCheck(),
-                ),
-              );
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginCheck(),
+                  ),
+                );
+              });
             } else if (response.code == 404 || response.data!.isEmpty) {
               return const Center(
                 child: Column(
