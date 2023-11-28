@@ -1,6 +1,8 @@
-import 'package:bookings_app/features/bookings/data/bookings_repository.dart';
+import 'package:bookings_app/auth_check.dart';
+import 'package:bookings_app/features/bookings/domain/bookings_service.dart';
 import 'package:bookings_app/features/bookings/model/booking.dart';
 import 'package:bookings_app/features/bookings/pages/bookings_create.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -13,35 +15,51 @@ class BookingsPage extends StatefulWidget {
 }
 
 class _BookingsPageState extends State<BookingsPage> {
-  late Future<List<Booking>> _bookings;
-  final BookingsRepository _bookingsRepository = BookingsRepository();
+  late Future<ApiResponse<List<Booking>>> _bookings;
+  final BookingsService _bookingsService = BookingsService();
 
   @override
   void initState() {
     super.initState();
-    _bookings = _bookingsRepository.getAllBookings();
+    var response = _bookingsService.getBookings();
+    _bookings = response;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<Booking>>(
+      body: FutureBuilder<ApiResponse<List<Booking>>>(
         future: _bookings,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                var booking = snapshot.data![index];
-                return BookingCard(
-                  booking: booking,
-                );
-              },
-            );
+            var response = snapshot.data!;
+
+            if (response.code == 401) {
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    LoginCheck.showLogoutNotification(context),
+              );
+            } else if (response.data!.isEmpty) {
+              return const Center(
+                child: Text("No se encontraron reservas. Crea una nueva"),
+              );
+            } else {
+              var bookings = response.data!;
+              return ListView.builder(
+                itemCount: bookings.length,
+                itemBuilder: (context, index) {
+                  var booking = bookings[index];
+                  return BookingCard(
+                    booking: booking,
+                  );
+                },
+              );
+            }
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         },
       ),
       floatingActionButton: FloatingActionButton(

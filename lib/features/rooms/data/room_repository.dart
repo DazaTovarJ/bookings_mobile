@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/shared/api_config.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +17,7 @@ class RoomRepository {
     _accessToken = prefs.getString('token')!;
   }
 
-  Future<List<Room>> getAllRooms() async {
+  Future<ApiResponse<List<Room>>> getAllRooms() async {
     await _getCredentials();
     final response = await _httpClient.get(
       _apiConfig.getResourceUri("rooms"),
@@ -25,14 +26,20 @@ class RoomRepository {
 
     var res = json.decode(response.body) as Map<String, dynamic>;
 
-    var roomsData = res["data"];
+    final apiResponse = ApiResponse<List<Room>>();
 
-    return roomsData.map<Room>((room) {
-      return Room.fromJson(room);
-    }).toList();
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    if (response.statusCode == 200) {
+      var roomsData = res["data"];
+      apiResponse.data =
+          roomsData.map<Room>((room) => Room.fromJson(room)).toList();
+    }
+    return apiResponse;
   }
 
-  Future<Room> getRoom(int id) async {
+  Future<ApiResponse<Room>> getRoom(int id) async {
     await _getCredentials();
     final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("rooms", id.toString()),
@@ -40,12 +47,20 @@ class RoomRepository {
     );
 
     var res = json.decode(response.body) as Map<String, dynamic>;
+    final apiResponse = ApiResponse<Room>();
 
-    Map<String, dynamic> roomsData = res["data"];
-    return Room.fromJson(roomsData);
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    if (response.statusCode == 200) {
+      var roomData = res["data"];
+      apiResponse.data = Room.fromJson(roomData);
+    }
+
+    return apiResponse;
   }
 
-  Future<Map<String, dynamic>> createRoom(Room room) async {
+  Future<ApiResponse> createRoom(Room room) async {
     await _getCredentials();
     final response = await _httpClient.post(
       _apiConfig.getResourceUri('rooms'),
@@ -56,11 +71,16 @@ class RoomRepository {
         'room_value': room.value.toString(),
       },
     );
+    var res = json.decode(response.body) as Map<String, dynamic>;
+    final apiResponse = ApiResponse();
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
-  Future<Map<String, dynamic>> updateRoom(Room room) async {
+  Future<ApiResponse> updateRoom(Room room) async {
     await _getCredentials();
     final response = await _httpClient.patch(
       _apiConfig.getUniqueResourceUri('rooms', room.id.toString()),
@@ -71,17 +91,28 @@ class RoomRepository {
         'room_value': room.value.toString(),
       },
     );
+    var res = json.decode(response.body) as Map<String, dynamic>;
+    final apiResponse = ApiResponse();
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
-  Future<Map<String, dynamic>> deleteRoom(int id) async {
+  Future<ApiResponse> deleteRoom(int id) async {
     await _getCredentials();
     final response = await _httpClient.delete(
       _apiConfig.getUniqueResourceUri("rooms", id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},
     );
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    var res = json.decode(response.body) as Map<String, dynamic>;
+    final apiResponse = ApiResponse();
+
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 }

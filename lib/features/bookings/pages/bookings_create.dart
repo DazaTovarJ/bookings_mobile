@@ -1,7 +1,9 @@
+import 'package:bookings_app/auth_check.dart';
 import 'package:bookings_app/features/bookings/domain/bookings_service.dart';
 import 'package:bookings_app/features/bookings/model/booking.dart';
 import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
 import 'package:bookings_app/features/rooms/model/room.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:bookings_app/shared/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +19,7 @@ class BookingsCreate extends StatefulWidget {
 class _BookingsCreateState extends State<BookingsCreate> {
   final _formKey = GlobalKey<FormState>();
 
-  late Future<List<Room>> rooms;
+  late Future<ApiResponse<List<Room>>> rooms;
   bool _isLoading = false;
   Room? selectedRoom;
 
@@ -53,214 +55,235 @@ class _BookingsCreateState extends State<BookingsCreate> {
       appBar: AppBar(
         title: const Text("Registrar Reservas"),
       ),
-      body: FutureBuilder<List<Room>>(
+      body: FutureBuilder<ApiResponse<List<Room>>>(
         future: rooms,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            var availableRooms = snapshot.data;
-            return Column(
-              children: [
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    child: ListView(
-                      padding: const EdgeInsets.all(16.0),
-                      children: [
-                        TextFormField(
-                          controller: nameCtrl,
-                          keyboardType: TextInputType.text,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Por favor, ingrese su nombre";
-                            }
-                            return null;
-                          },
-                          decoration: const InputDecoration(
-                            filled: true,
-                            prefixIcon: Icon(Symbols.person),
-                            labelText: "Nombre",
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: phoneCtrl,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            filled: true,
-                            prefixIcon: Icon(Symbols.phone),
-                            labelText: "Teléfono",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return "Por favor, ingrese su número de teléfono";
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: bookingdateCtrl,
-                          readOnly: true,
-                          keyboardType: TextInputType.datetime,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Symbols.calendar_today),
-                            filled: true,
-                            labelText: "Fecha de Reserva",
-                          ),
-                          onTap: () {
-                            _showDatePicker(bookingdateCtrl);
-                          },
-                          validator: (value) {
-                            DateFormat format = DateFormat('dd/MM/yyyy');
-                            if (value == null || value.isEmpty) {
-                              return "Por favor, ingrese la fecha de reserva";
-                            }
+            var response = snapshot.data!;
 
-                            if (format.parse(value).isBefore(DateTime.now())) {
-                              return "La fecha de reserva no puede ser menor a la"
-                                  " fecha actual";
-                            }
-
-                            if (checkinCtrl.text.isNotEmpty &&
-                                checkoutCtrl.text.isNotEmpty) {
-                              if (format
-                                  .parse(value)
-                                  .isAfter(format.parse(checkinCtrl.text))) {
-                                return "La fecha de reserva no puede ser mayor a su"
-                                    " fecha de inicio";
+            if (response.code == 401) {
+              showDialog(
+                context: context,
+                builder: (context) =>
+                    LoginCheck.showLogoutNotification(context),
+              );
+            } else if (response.data!.isEmpty) {
+              _showDialog(
+                title: "Información",
+                message: "No hay habitaciones disponibles.",
+                type: "info",
+              );
+            } else {
+              var availableRooms = response.data!;
+              return Column(
+                children: [
+                  Expanded(
+                    child: Form(
+                      key: _formKey,
+                      child: ListView(
+                        padding: const EdgeInsets.all(16.0),
+                        children: [
+                          TextFormField(
+                            controller: nameCtrl,
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Por favor, ingrese su nombre";
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              filled: true,
+                              prefixIcon: Icon(Symbols.person),
+                              labelText: "Nombre",
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: phoneCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              filled: true,
+                              prefixIcon: Icon(Symbols.phone),
+                              labelText: "Teléfono",
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Por favor, ingrese su número de teléfono";
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: bookingdateCtrl,
+                            readOnly: true,
+                            keyboardType: TextInputType.datetime,
+                            decoration: const InputDecoration(
+                              prefixIcon: Icon(Symbols.calendar_today),
+                              filled: true,
+                              labelText: "Fecha de Reserva",
+                            ),
+                            onTap: () {
+                              _showDatePicker(bookingdateCtrl);
+                            },
+                            validator: (value) {
+                              DateFormat format = DateFormat('dd/MM/yyyy');
+                              if (value == null || value.isEmpty) {
+                                return "Por favor, ingrese la fecha de reserva";
                               }
 
                               if (format
                                   .parse(value)
-                                  .isAfter(format.parse(checkoutCtrl.text))) {
-                                return "La fecha de reserva no puede ser mayor a su"
-                                    " fecha de cierre";
+                                  .isBefore(DateTime.now())) {
+                                return "La fecha de reserva no puede ser menor a la"
+                                    " fecha actual";
                               }
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: checkinCtrl,
-                          readOnly: true,
-                          keyboardType: TextInputType.datetime,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Symbols.calendar_clock),
-                            filled: true,
-                            labelText: "Desde",
+
+                              if (checkinCtrl.text.isNotEmpty &&
+                                  checkoutCtrl.text.isNotEmpty) {
+                                if (format
+                                    .parse(value)
+                                    .isAfter(format.parse(checkinCtrl.text))) {
+                                  return "La fecha de reserva no puede ser mayor a su"
+                                      " fecha de inicio";
+                                }
+
+                                if (format
+                                    .parse(value)
+                                    .isAfter(format.parse(checkoutCtrl.text))) {
+                                  return "La fecha de reserva no puede ser mayor a su"
+                                      " fecha de cierre";
+                                }
+                              }
+                              return null;
+                            },
                           ),
-                          onTap: () {
-                            _showDatePicker(checkinCtrl);
-                          },
-                          validator: (value) {
-                            DateFormat format = DateFormat('dd/MM/yyyy');
-                            if (value == null || value.isEmpty) {
-                              return "Por favor, ingrese la fecha de inicio de la"
-                                  " reserva";
-                            }
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: checkinCtrl,
+                            readOnly: true,
+                            keyboardType: TextInputType.datetime,
+                            decoration: const InputDecoration(
+                              prefixIcon: Icon(Symbols.calendar_clock),
+                              filled: true,
+                              labelText: "Desde",
+                            ),
+                            onTap: () {
+                              _showDatePicker(checkinCtrl);
+                            },
+                            validator: (value) {
+                              DateFormat format = DateFormat('dd/MM/yyyy');
+                              if (value == null || value.isEmpty) {
+                                return "Por favor, ingrese la fecha de inicio de la"
+                                    " reserva";
+                              }
 
-                            if (format.parse(value).isBefore(DateTime.now())) {
-                              return "La fecha de inicio no puede ser menor a la"
-                                  " fecha actual";
-                            }
-
-                            if (checkoutCtrl.text.isNotEmpty) {
                               if (format
                                   .parse(value)
-                                  .isAfter(format.parse(checkoutCtrl.text))) {
-                                return "La fecha de inicio no puede ser mayor a la"
-                                    " fecha de cierre de la reserva";
+                                  .isBefore(DateTime.now())) {
+                                return "La fecha de inicio no puede ser menor a la"
+                                    " fecha actual";
                               }
-                            }
 
-                            if (bookingdateCtrl.text.isNotEmpty) {
+                              if (checkoutCtrl.text.isNotEmpty) {
+                                if (format
+                                    .parse(value)
+                                    .isAfter(format.parse(checkoutCtrl.text))) {
+                                  return "La fecha de inicio no puede ser mayor a la"
+                                      " fecha de cierre de la reserva";
+                                }
+                              }
+
+                              if (bookingdateCtrl.text.isNotEmpty) {
+                                if (format.parse(value).isBefore(
+                                    format.parse(bookingdateCtrl.text))) {
+                                  return "La fecha de inicio no puede ser menor a la"
+                                      " fecha de reserva";
+                                }
+                              }
+
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: checkoutCtrl,
+                            keyboardType: TextInputType.datetime,
+                            readOnly: true,
+                            decoration: const InputDecoration(
+                              prefixIcon: Icon(Symbols.calendar_clock),
+                              filled: true,
+                              labelText: "Hasta",
+                            ),
+                            onTap: () {
+                              _showDatePicker(checkoutCtrl);
+                            },
+                            validator: (value) {
+                              DateFormat format = DateFormat('dd/MM/yyyy');
+                              if (value == null || value.isEmpty) {
+                                return "Por favor, ingrese la fecha de cierre de la"
+                                    " reserva";
+                              }
+
+                              if (format
+                                  .parse(value)
+                                  .isBefore(DateTime.now())) {
+                                return "La fecha de cierre no puede ser menor a la"
+                                    " fecha actual";
+                              }
+
                               if (format.parse(value).isBefore(
                                   format.parse(bookingdateCtrl.text))) {
-                                return "La fecha de inicio no puede ser menor a la"
+                                return "La fecha de cierre no puede ser menor a la"
                                     " fecha de reserva";
                               }
-                            }
 
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: checkoutCtrl,
-                          keyboardType: TextInputType.datetime,
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                            prefixIcon: Icon(Symbols.calendar_clock),
-                            filled: true,
-                            labelText: "Hasta",
+                              if (format
+                                  .parse(value)
+                                  .isBefore(format.parse(checkinCtrl.text))) {
+                                return "La fecha de cierre no puede ser menor a la"
+                                    " fecha de inicio de la reserva";
+                              }
+
+                              return null;
+                            },
                           ),
-                          onTap: () {
-                            _showDatePicker(checkoutCtrl);
-                          },
-                          validator: (value) {
-                            DateFormat format = DateFormat('dd/MM/yyyy');
-                            if (value == null || value.isEmpty) {
-                              return "Por favor, ingrese la fecha de cierre de la"
-                                  " reserva";
-                            }
-
-                            if (format.parse(value).isBefore(DateTime.now())) {
-                              return "La fecha de cierre no puede ser menor a la"
-                                  " fecha actual";
-                            }
-
-                            if (format
-                                .parse(value)
-                                .isBefore(format.parse(bookingdateCtrl.text))) {
-                              return "La fecha de cierre no puede ser menor a la"
-                                  " fecha de reserva";
-                            }
-
-                            if (format
-                                .parse(value)
-                                .isBefore(format.parse(checkinCtrl.text))) {
-                              return "La fecha de cierre no puede ser menor a la"
-                                  " fecha de inicio de la reserva";
-                            }
-
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _buildDropdownMenu(
-                          context,
-                          availableRooms!,
-                          "Habitación",
-                          const Icon(Symbols.hotel),
-                          roomCtrl,
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          _buildDropdownMenu(
+                            context,
+                            availableRooms,
+                            "Habitación",
+                            const Icon(Symbols.hotel),
+                            roomCtrl,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: FilledButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              createBooking().then((value) {
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: FilledButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
                                 setState(() {
-                                  _isLoading = false;
+                                  _isLoading = true;
                                 });
-                              });
-                            }
-                          },
-                    child: const Text("Registrar"),
+                                createBooking().then((value) {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                });
+                              }
+                            },
+                      child: const Text("Registrar"),
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
+            }
           } else if (snapshot.hasError) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -355,21 +378,33 @@ class _BookingsCreateState extends State<BookingsCreate> {
           end: checkout,
           room: room));
 
+      if (!context.mounted) return;
+      if (response.code == 401) {
+        showDialog(
+          context: context,
+          builder: (context) => LoginCheck.showLogoutNotification(context),
+        );
+      }
+
       _showDialog(
-          response["message"], response["code"] == 201 ? "success" : "error");
+        message: response.message,
+        type: response.code == 201 ? "success" : "error",
+      );
     } catch (e) {
-      print(e);
-      _showDialog("Error al registrar la reserva", "error");
+      _showDialog(
+        message: "Error al registrar la reserva",
+        type: "error",
+      );
     }
   }
 
-  _showDialog(String message, String type) {
+  _showDialog({required String message, required String type, String? title}) {
     var theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(type == 'error' ? 'Error' : 'Éxito'),
+          title: Text(type == 'error' ? 'Error' : title ?? 'Éxito'),
           backgroundColor: type == 'error'
               ? theme.colorScheme.errorContainer
               : theme.dialogTheme.backgroundColor,
@@ -377,7 +412,7 @@ class _BookingsCreateState extends State<BookingsCreate> {
           actions: [
             TextButton(
               onPressed: () {
-                type != "success"
+                type == "error" || type == "warning"
                     ? Navigator.pop(context)
                     : Navigator.pushAndRemoveUntil(
                         context,

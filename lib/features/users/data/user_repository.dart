@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bookings_app/features/users/model/user.dart';
 import 'package:bookings_app/shared/api_config.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,22 +31,25 @@ class UserRepository {
     return userData.map((user) => User.fromJson(user)).toList();
   }
 
-  Future<User> getUser(int id) async {
+  Future<ApiResponse<User>> getUser(int id) async {
     final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("users", id.toString()),
       headers: {
         'Authorization': "Bearer $accessToken"
       },
     );
-
+    final apiResponse = ApiResponse<User>();
     var res = json.decode(response.body) as Map<String, dynamic>;
 
-    if (!res.containsKey("data") || res["data"] == null) {
-      return Future.error("Usuario no encontrado");
+    apiResponse.code = res["code"];
+
+    if (response.statusCode == 200) {
+      apiResponse.data = User.fromJson(res["data"]);
     }
 
-    Map<String, dynamic> userData = res["data"];
-    return User.fromJson(userData);
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
   Future<Map<String, dynamic>> updateUser(User user) async {

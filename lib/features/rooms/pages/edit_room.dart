@@ -1,3 +1,4 @@
+import 'package:bookings_app/auth_check.dart';
 import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
 import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/shared/main_layout.dart';
@@ -36,9 +37,17 @@ class _EditRoomPageState extends State<EditRoomPage> {
 
       var response = await _roomService.updateRoom(room);
 
+      if (!context.mounted) return;
+      if (response.code == 401) {
+        showDialog(
+          context: context,
+          builder: (context) => LoginCheck.showLogoutNotification(context),
+        );
+      }
+
       _showDialog(
-        response["message"],
-        response["code"] == 200 ? "success" : "error",
+        response.message,
+        response.code == 201 ? "success" : "error",
       );
     }
   }

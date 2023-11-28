@@ -1,7 +1,9 @@
+import 'package:bookings_app/auth_check.dart';
 import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
 import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/features/rooms/pages/create_room.dart';
 import 'package:bookings_app/features/rooms/pages/edit_room.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:flutter/material.dart';
 
 class RoomsPage extends StatefulWidget {
@@ -14,7 +16,7 @@ class RoomsPage extends StatefulWidget {
 class _RoomsPageState extends State<RoomsPage> {
   final RoomService _roomService = RoomService();
 
-  late Future<List<Room>> _rooms;
+  late Future<ApiResponse<List<Room>>> _rooms;
 
   void _showDeleteConfirmationAlert(Room room) {
     var theme = Theme.of(context);
@@ -59,7 +61,7 @@ class _RoomsPageState extends State<RoomsPage> {
     try {
       final response = await _roomService.deleteRoom(id);
 
-      _showDialog(response["message"], response["code"] == 200 ? "success" : "error");
+      _showDialog(response.message, response.code == 200 ? "success" : "error");
     } catch (e) {
       _showDialog("Error al eliminar la habitación", "error");
     }
@@ -98,63 +100,74 @@ class _RoomsPageState extends State<RoomsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
+      body: FutureBuilder<ApiResponse<List<Room>>>(
         future: _rooms,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           if (snapshot.hasError) {
-            print(snapshot.error);
             return const Center(child: Text('Error al obtener las habitaciones'));
           }
 
-          var rooms = snapshot.data;
-          return ListView.builder(
-            itemCount: rooms!.length,
-            itemBuilder: (context, index) {
-              var room = rooms[index];
-              return Card(
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Column(
-                        children: [
-                          const Icon(Icons.hotel),
-                          Text(room.roomNumber),
-                        ],
-                      ),
-                      title: Text("Habitación ${room.roomNumber}"),
-                      subtitle: Text('Clase: ${room.type}'),
-                      trailing: Text("\$${room.value}"),
-                    ),
-                    ButtonBar(
+          if (snapshot.hasData) {
+            var response = snapshot.data!;
+            if (response.code == 401) {
+              showDialog(
+                context: context,
+                builder: (context) => LoginCheck.showLogoutNotification(context),
+              );
+            } else if (response.data!.isEmpty) {
+              return const Center(
+                child: Text("No se encontraron habitaciones. Crea una nueva"),
+              );
+            } else {
+              var rooms = response.data!;
+              return ListView.builder(
+                itemCount: rooms.length,
+                itemBuilder: (context, index) {
+                  var room = rooms[index];
+                  return Card(
+                    child: Column(
                       children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditRoomPage(room: room),
-                              ),
-                            );
-                          },
-                          child: const Text('Editar'),
+                        ListTile(
+                          leading: Column(
+                            children: [
+                              const Icon(Icons.hotel),
+                              Text(room.roomNumber),
+                            ],
+                          ),
+                          title: Text("Habitación ${room.roomNumber}"),
+                          subtitle: Text('Clase: ${room.type}'),
+                          trailing: Text("\$${room.value}"),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            _showDeleteConfirmationAlert(room);
-                          },
-                          child: const Text('Eliminar'),
+                        ButtonBar(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditRoomPage(room: room),
+                                  ),
+                                );
+                              },
+                              child: const Text('Editar'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                _showDeleteConfirmationAlert(room);
+                              },
+                              child: const Text('Eliminar'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  );
+                },
               );
-            },
-          );
+            }
+          }
+
+          return const Center(child: CircularProgressIndicator());
         }
       ),
       floatingActionButton: FloatingActionButton(

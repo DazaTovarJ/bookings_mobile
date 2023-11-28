@@ -10,6 +10,34 @@ class LoginCheck extends StatefulWidget {
 
   @override
   State<LoginCheck> createState() => _LoginCheckState();
+
+  static Widget showLogoutNotification(BuildContext context) =>
+      _showNotification(context, 'Sesión Cerrada', 'Su sesión ha sido cerrada');
+
+  static Widget _showNotification(
+      BuildContext context, String title, String message) {
+    AlertDialog dialog = AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () {
+            AuthenticationService().logout();
+            BlocProvider.of<UserCubit>(context).logout();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginPage(),
+              ),
+            );
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    );
+
+    return dialog;
+  }
 }
 
 class _LoginCheckState extends State<LoginCheck> {

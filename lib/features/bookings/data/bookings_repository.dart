@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bookings_app/features/bookings/model/booking.dart';
 import 'package:bookings_app/shared/api_config.dart';
+import 'package:bookings_app/shared/api_response.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +17,7 @@ class BookingsRepository {
     _accessToken = prefs.getString('token')!;
   }
 
-  Future<Map<String, dynamic>> createBooking(Booking booking) async {
+  Future<ApiResponse> createBooking(Booking booking) async {
     await _getCredentials();
     final response = await _httpClient.post(
       _apiConfig.getResourceUri('bookings'),
@@ -31,15 +32,21 @@ class BookingsRepository {
       },
     );
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    var res = json.decode(response.body) as Map<String, dynamic>;
+
+    final apiResponse = ApiResponse();
+
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
-  Future<Map<String, dynamic>> updateBooking(Booking booking) async {
+  Future<ApiResponse> updateBooking(Booking booking) async {
     await _getCredentials();
     final response = await _httpClient.patch(
       _apiConfig.getUniqueResourceUri('bookings', booking.id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},
-      // TODO: Diseñar guardado del token
       body: {
         'name': booking.clientName,
         'phone': booking.clientPhone,
@@ -50,36 +57,56 @@ class BookingsRepository {
       },
     );
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    var res = json.decode(response.body) as Map<String, dynamic>;
+
+    final apiResponse = ApiResponse();
+
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
-  Future<Map<String, dynamic>> deleteBooking(int id) async {
+  Future<ApiResponse> deleteBooking(int id) async {
     await _getCredentials();
     final response = await _httpClient.delete(
       _apiConfig.getUniqueResourceUri("bookings", id.toString()),
       headers: {'Authorization': "Bearer $_accessToken"},
     );
 
-    return json.decode(response.body) as Map<String, dynamic>;
+    var res =  json.decode(response.body) as Map<String, dynamic>;
+
+    final apiResponse = ApiResponse();
+
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    return apiResponse;
   }
 
-  Future<List<Booking>> getAllBookings() async {
+  Future<ApiResponse<List<Booking>>> getAllBookings() async {
     await _getCredentials();
     final response = await _httpClient.get(
       _apiConfig.getResourceUri("bookings"),
       headers: {'Authorization': "Bearer $_accessToken"},
     );
+    final apiResponse = ApiResponse<List<Booking>>();
 
     var res = json.decode(response.body) as Map<String, dynamic>;
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
 
-    var bookingsData = res["data"];
+    if (response.statusCode == 200) {
+      var bookingsData = res["data"];
+      apiResponse.data = bookingsData
+          .map<Booking>((booking) => Booking.fromJson(booking))
+          .toList();
+    }
 
-    return bookingsData
-        .map<Booking>((booking) => Booking.fromJson(booking))
-        .toList();
+    return apiResponse;
   }
 
-  Future<Booking> getBooking(int id) async {
+  Future<ApiResponse<Booking>> getBooking(int id) async {
     await _getCredentials();
     final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("bookings", id.toString()),
@@ -87,8 +114,16 @@ class BookingsRepository {
     );
 
     var res = json.decode(response.body) as Map<String, dynamic>;
+    final apiResponse = ApiResponse<Booking>();
 
-    Map<String, dynamic> bookingsData = res["data"];
-    return Booking.fromJson(bookingsData);
+    apiResponse.code = res["code"];
+    apiResponse.message = res["message"];
+
+    if (response.statusCode == 200) {
+      var bookingsData = res["data"];
+      apiResponse.data = Booking.fromJson(bookingsData);
+    }
+
+    return apiResponse;
   }
 }

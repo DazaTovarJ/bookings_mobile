@@ -16,8 +16,10 @@ class AuthenticationService {
     return await _authRepository.register(firstName, lastName, email, password);
   }
 
-  Future<User> getUserInfo(int id) async {
-    return await _userRepository.getUser(id);
+  Future<User?> getUserInfo(int id) async {
+    var userResponse = await _userRepository.getUser(id);
+
+    return userResponse.data;
   }
 
   Future<User> checkSharedPrefs() async {
@@ -30,6 +32,10 @@ class AuthenticationService {
     }
 
     var user = await getUserInfo(userId);
+
+    if (user == null) {
+      return Future.error("No se encontró el usuario");
+    }
 
     updateSharedPrefs(token, user.id!);
 
