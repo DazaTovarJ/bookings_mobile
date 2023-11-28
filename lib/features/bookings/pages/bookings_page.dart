@@ -2,6 +2,7 @@ import 'package:bookings_app/auth_check.dart';
 import 'package:bookings_app/features/bookings/domain/bookings_service.dart';
 import 'package:bookings_app/features/bookings/model/booking.dart';
 import 'package:bookings_app/features/bookings/pages/bookings_create.dart';
+import 'package:bookings_app/features/bookings/pages/edit_booking.dart';
 import 'package:bookings_app/shared/api_response.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -147,7 +148,14 @@ class BookingCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditBookingPage(booking: booking),
+                    ),
+                  );
+                },
                 child: const Text("Editar"),
               ),
               TextButton(
