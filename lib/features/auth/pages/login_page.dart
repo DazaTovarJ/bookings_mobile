@@ -5,6 +5,7 @@ import 'package:bookings_app/shared/auth_state.dart';
 import 'package:bookings_app/shared/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -127,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                                               ),
                                               border: InputBorder.none,
                                               prefixIcon: Icon(
-                                                Icons.email,
+                                                Symbols.email,
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurfaceVariant,
@@ -161,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                                               ),
                                               border: InputBorder.none,
                                               prefixIcon: Icon(
-                                                Icons.key,
+                                                Symbols.key,
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurfaceVariant,
@@ -174,8 +175,8 @@ class _LoginPageState extends State<LoginPage> {
                                                 },
                                                 icon: Icon(
                                                   !obscurePass
-                                                      ? Icons.visibility
-                                                      : Icons.visibility_off,
+                                                      ? Symbols.visibility
+                                                      : Symbols.visibility_off,
                                                   color: Theme.of(context)
                                                       .colorScheme
                                                       .onSurfaceVariant,

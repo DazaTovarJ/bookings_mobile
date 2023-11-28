@@ -5,6 +5,7 @@ import 'package:bookings_app/features/rooms/pages/create_room.dart';
 import 'package:bookings_app/features/rooms/pages/edit_room.dart';
 import 'package:bookings_app/shared/api_response.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class RoomsPage extends StatefulWidget {
@@ -101,6 +102,13 @@ class _RoomsPageState extends State<RoomsPage> {
 
   @override
   Widget build(BuildContext context) {
+    var currencyFormat = NumberFormat.currency(
+      locale: 'es_MX',
+      name: 'COP',
+      symbol: '\$',
+      decimalDigits: 0,
+    );
+
     return Scaffold(
       body: FutureBuilder<ApiResponse<List<Room>>>(
           future: _rooms,
@@ -146,13 +154,13 @@ class _RoomsPageState extends State<RoomsPage> {
                           ListTile(
                             leading: Column(
                               children: [
-                                const Icon(Icons.hotel),
+                                const Icon(Symbols.hotel),
                                 Text(room.roomNumber),
                               ],
                             ),
                             title: Text("Habitación ${room.roomNumber}"),
                             subtitle: Text('Clase: ${room.type}'),
-                            trailing: Text("\$${room.value}"),
+                            trailing: Text(currencyFormat.format(room.value)),
                           ),
                           ButtonBar(
                             children: [
@@ -193,7 +201,7 @@ class _RoomsPageState extends State<RoomsPage> {
             MaterialPageRoute(builder: (context) => const CreateRoomPage()),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Symbols.add),
       ),
     );
   }

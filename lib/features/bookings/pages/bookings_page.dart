@@ -159,7 +159,7 @@ class _BookingsPageState extends State<BookingsPage> {
             ),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Symbols.add),
       ),
     );
   }

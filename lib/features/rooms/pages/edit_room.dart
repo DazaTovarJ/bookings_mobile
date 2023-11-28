@@ -3,6 +3,7 @@ import 'package:bookings_app/features/rooms/domain/rooms_service.dart';
 import 'package:bookings_app/features/rooms/model/room.dart';
 import 'package:bookings_app/shared/main_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class EditRoomPage extends StatefulWidget {
   const EditRoomPage({super.key, required this.room});
@@ -113,6 +114,8 @@ class _EditRoomPageState extends State<EditRoomPage> {
                   TextFormField(
                     controller: _roomNumberController,
                     decoration: const InputDecoration(
+                      filled: true,
+                      prefixIcon: Icon(Symbols.hotel),
                       labelText: 'Número de habitación',
                     ),
                     validator: (value) {
@@ -122,9 +125,12 @@ class _EditRoomPageState extends State<EditRoomPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _roomTypeController,
                     decoration: const InputDecoration(
+                      filled: true,
+                      prefixIcon: Icon(Symbols.room_service),
                       labelText: 'Tipo de habitación',
                     ),
                     validator: (value) {
@@ -134,9 +140,12 @@ class _EditRoomPageState extends State<EditRoomPage> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 16),
                   TextFormField(
                     controller: _roomValueController,
                     decoration: const InputDecoration(
+                      filled: true,
+                      prefixIcon: Icon(Symbols.attach_money),
                       labelText: 'Precio',
                     ),
                     keyboardType: TextInputType.number,
