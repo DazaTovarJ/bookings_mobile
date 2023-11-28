@@ -68,7 +68,7 @@ class _BookingsCreateState extends State<BookingsCreate> {
                   builder: (context) => const LoginCheck(),
                 ),
               );
-            } else if (response.data!.isEmpty) {
+            } else if (response.code == 404 || response.data!.isEmpty) {
               _showDialog(
                 title: "Información",
                 message: "No hay habitaciones disponibles.",

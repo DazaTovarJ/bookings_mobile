@@ -5,6 +5,7 @@ import 'package:bookings_app/features/rooms/pages/create_room.dart';
 import 'package:bookings_app/features/rooms/pages/edit_room.dart';
 import 'package:bookings_app/shared/api_response.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class RoomsPage extends StatefulWidget {
   const RoomsPage({super.key});
@@ -118,9 +119,18 @@ class _RoomsPageState extends State<RoomsPage> {
                     builder: (context) => const LoginCheck(),
                   ),
                 );
-              } else if (response.data!.isEmpty) {
+              } else if (response.code == 404 || response.data!.isEmpty) {
                 return const Center(
-                  child: Text("No se encontraron habitaciones. Crea una nueva"),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.local_hotel,
+                        size: 100,
+                      ),
+                      Text("No se encontraron habitaciones. Crea una nueva"),
+                    ],
+                  ),
                 );
               } else {
                 var rooms = response.data!;
