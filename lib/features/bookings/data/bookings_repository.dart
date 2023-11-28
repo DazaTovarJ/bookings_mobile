@@ -28,7 +28,7 @@ class BookingsRepository {
         'booking_date': booking.bookingDate.toIso8601String(),
         'check_in': booking.start.toIso8601String(),
         'check_out': booking.end.toIso8601String(),
-        'room': booking.room.toString(),
+        'room': booking.room.id.toString(),
       },
     );
 
@@ -53,7 +53,7 @@ class BookingsRepository {
         'booking_date': booking.bookingDate.toIso8601String(),
         'check_in': booking.start.toIso8601String(),
         'check_out': booking.end.toIso8601String(),
-        'room': booking.room.toString(),
+        'room': booking.room.id.toString(),
       },
     );
 

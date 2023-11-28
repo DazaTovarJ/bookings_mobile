@@ -137,7 +137,7 @@ class BookingCard extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 10),
-                    const Text("P001"),
+                    Text(booking.room.roomNumber),
                   ],
                 ),
               ],

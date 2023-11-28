@@ -1,4 +1,4 @@
-// import 'package:bookings_app/features/rooms/model/room.dart';
+import 'package:bookings_app/features/rooms/model/room.dart';
 
 class Booking {
   final int? id;
@@ -7,8 +7,7 @@ class Booking {
   final DateTime bookingDate;
   final DateTime start;
   final DateTime end;
-  // final Room room;
-  final int room;
+  final Room room;
 
   Booking({
     this.id,
@@ -28,8 +27,7 @@ class Booking {
       bookingDate: DateTime.parse(json['booking_date']),
       start: DateTime.parse(json['entry_date']),
       end: DateTime.parse(json['end_date']),
-      room: json['room_id'],
-      // room: Room.fromJson(json['room']),
+      room: Room.fromJson(json['room']),
     );
   }
 
@@ -41,6 +39,6 @@ class Booking {
     'entry_date': start.toIso8601String(),
     'end_date': end.toIso8601String(),
     'room_id': room,
-    // 'room': room.toJson(),
+    'room': room.toJson(),
   };
 }

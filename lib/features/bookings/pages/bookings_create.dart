@@ -370,7 +370,7 @@ class _BookingsCreateState extends State<BookingsCreate> {
       DateTime bookingDate = format.parse(bookingdateCtrl.text);
       DateTime checkin = format.parse(checkinCtrl.text);
       DateTime checkout = format.parse(checkoutCtrl.text);
-      int room = selectedRoom!.id!;
+      Room room = selectedRoom!;
       final response = await _bookingsService.createBooking(Booking(
           clientName: name,
           clientPhone: phone,
