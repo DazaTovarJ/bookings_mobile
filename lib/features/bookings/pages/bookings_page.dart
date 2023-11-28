@@ -104,7 +104,7 @@ class BookingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(booking.clientName, style: theme.textTheme.headlineMedium),
+          Text(booking.clientName, style: theme.textTheme.titleLarge),
           const SizedBox(height: 10),
           Container(
             width: MediaQuery.of(context).size.width,
@@ -138,7 +138,12 @@ class BookingCard extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 10),
-                    Text(booking.room.roomNumber),
+                    Text(
+                      "${booking.room.roomNumber} - ${booking.room.type}",
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
               ],
