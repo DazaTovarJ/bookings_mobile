@@ -57,7 +57,10 @@ class _BookingsPageState extends State<BookingsPage> {
               );
             }
           } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
+            print(snapshot.error);
+            return const Center(
+              child: Text("Ocurrió un error al cargar la lista de reservas."),
+            );
           }
           return const Center(child: CircularProgressIndicator());
         },

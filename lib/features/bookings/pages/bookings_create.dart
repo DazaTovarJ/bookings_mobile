@@ -285,8 +285,9 @@ class _BookingsCreateState extends State<BookingsCreate> {
               );
             }
           } else if (snapshot.hasError) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            _showDialog(
+              message: "No se pudo obtener la lista de habitaciones",
+              type: "error",
             );
           }
           return const Center(
