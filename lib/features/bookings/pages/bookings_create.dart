@@ -62,10 +62,11 @@ class _BookingsCreateState extends State<BookingsCreate> {
             var response = snapshot.data!;
 
             if (response.code == 401) {
-              showDialog(
-                context: context,
-                builder: (context) =>
-                    LoginCheck.showLogoutNotification(context),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginCheck(),
+                ),
               );
             } else if (response.data!.isEmpty) {
               _showDialog(
@@ -381,10 +382,13 @@ class _BookingsCreateState extends State<BookingsCreate> {
 
       if (!context.mounted) return;
       if (response.code == 401) {
-        showDialog(
-          context: context,
-          builder: (context) => LoginCheck.showLogoutNotification(context),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginCheck(),
+          ),
         );
+        return;
       }
 
       _showDialog(

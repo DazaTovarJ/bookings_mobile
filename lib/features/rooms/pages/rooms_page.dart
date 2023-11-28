@@ -42,7 +42,8 @@ class _RoomsPageState extends State<RoomsPage> {
     AlertDialog dialog = AlertDialog(
       backgroundColor: theme.colorScheme.errorContainer,
       title: const Text("Eliminación de habitación"),
-      content: Text("¿Está seguro que desea eliminar la habitación ${room.roomNumber}?"),
+      content: Text(
+          "¿Está seguro que desea eliminar la habitación ${room.roomNumber}?"),
       actions: [
         yesButton,
         noButton,
@@ -101,75 +102,78 @@ class _RoomsPageState extends State<RoomsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<ApiResponse<List<Room>>>(
-        future: _rooms,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error al obtener las habitaciones'));
-          }
-
-          if (snapshot.hasData) {
-            var response = snapshot.data!;
-            if (response.code == 401) {
-              showDialog(
-                context: context,
-                builder: (context) => LoginCheck.showLogoutNotification(context),
-              );
-            } else if (response.data!.isEmpty) {
+          future: _rooms,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
               return const Center(
-                child: Text("No se encontraron habitaciones. Crea una nueva"),
-              );
-            } else {
-              var rooms = response.data!;
-              return ListView.builder(
-                itemCount: rooms.length,
-                itemBuilder: (context, index) {
-                  var room = rooms[index];
-                  return Card(
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Column(
+                  child: Text('Error al obtener las habitaciones'));
+            }
+
+            if (snapshot.hasData) {
+              var response = snapshot.data!;
+              if (response.code == 401) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginCheck(),
+                  ),
+                );
+              } else if (response.data!.isEmpty) {
+                return const Center(
+                  child: Text("No se encontraron habitaciones. Crea una nueva"),
+                );
+              } else {
+                var rooms = response.data!;
+                return ListView.builder(
+                  itemCount: rooms.length,
+                  itemBuilder: (context, index) {
+                    var room = rooms[index];
+                    return Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: Column(
+                              children: [
+                                const Icon(Icons.hotel),
+                                Text(room.roomNumber),
+                              ],
+                            ),
+                            title: Text("Habitación ${room.roomNumber}"),
+                            subtitle: Text('Clase: ${room.type}'),
+                            trailing: Text("\$${room.value}"),
+                          ),
+                          ButtonBar(
                             children: [
-                              const Icon(Icons.hotel),
-                              Text(room.roomNumber),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EditRoomPage(room: room),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Editar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  _showDeleteConfirmationAlert(room);
+                                },
+                                child: const Text('Eliminar'),
+                              ),
                             ],
                           ),
-                          title: Text("Habitación ${room.roomNumber}"),
-                          subtitle: Text('Clase: ${room.type}'),
-                          trailing: Text("\$${room.value}"),
-                        ),
-                        ButtonBar(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditRoomPage(room: room),
-                                  ),
-                                );
-                              },
-                              child: const Text('Editar'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                _showDeleteConfirmationAlert(room);
-                              },
-                              child: const Text('Eliminar'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }
             }
-          }
 
-          return const Center(child: CircularProgressIndicator());
-        }
-      ),
+            return const Center(child: CircularProgressIndicator());
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

@@ -10,6 +10,40 @@ class LoginCheck extends StatefulWidget {
 
   @override
   State<LoginCheck> createState() => _LoginCheckState();
+}
+
+class _LoginCheckState extends State<LoginCheck> {
+  int userId = 0;
+
+  final AuthenticationService _authenticationService = AuthenticationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  void _loadUserInfo() async {
+    try {
+      var user = await _authenticationService.checkSharedPrefs();
+      if (!context.mounted) return;
+
+      BlocProvider.of<UserCubit>(context).login(user);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MainLayout(),
+        ),
+      );
+    } catch (e) {
+      showLogoutNotification(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+  }
 
   static Widget showLogoutNotification(BuildContext context) =>
       _showNotification(context, 'Sesión Cerrada', 'Su sesión ha sido cerrada');
@@ -37,44 +71,5 @@ class LoginCheck extends StatefulWidget {
     );
 
     return dialog;
-  }
-}
-
-class _LoginCheckState extends State<LoginCheck> {
-  int userId = 0;
-
-  final AuthenticationService _authenticationService = AuthenticationService();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserInfo();
-  }
-
-  void _loadUserInfo() async {
-    try {
-      var user = await _authenticationService.checkSharedPrefs();
-      if (!context.mounted) return;
-
-      BlocProvider.of<UserCubit>(context).login(user);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainLayout(),
-        ),
-      );
-    } catch (e) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoginPage(),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }

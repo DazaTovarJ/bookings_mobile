@@ -36,10 +36,11 @@ class _BookingsPageState extends State<BookingsPage> {
             var response = snapshot.data!;
 
             if (response.code == 401) {
-              showDialog(
-                context: context,
-                builder: (context) =>
-                    LoginCheck.showLogoutNotification(context),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginCheck(),
+                ),
               );
             } else if (response.data!.isEmpty) {
               return const Center(
