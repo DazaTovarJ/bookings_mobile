@@ -20,9 +20,7 @@ class UserRepository {
   Future<List<User>> getAllUsers() async {
     final response = await _httpClient.get(
       _apiConfig.getResourceUri("users"),
-      headers: {
-        'Authorization': "Bearer $accessToken"
-      },
+      headers: {'Authorization': "Bearer $accessToken"},
     );
 
     var res = json.decode(response.body) as Map<String, dynamic>;
@@ -34,9 +32,7 @@ class UserRepository {
   Future<ApiResponse<User>> getUser(int id) async {
     final response = await _httpClient.get(
       _apiConfig.getUniqueResourceUri("users", id.toString()),
-      headers: {
-        'Authorization': "Bearer $accessToken"
-      },
+      headers: {'Authorization': "Bearer $accessToken"},
     );
     final apiResponse = ApiResponse<User>();
     var res = json.decode(response.body) as Map<String, dynamic>;
@@ -56,7 +52,6 @@ class UserRepository {
     final response = await _httpClient.patch(
       _apiConfig.getUniqueResourceUri('users', user.id.toString()),
       headers: {'Authorization': "Bearer $accessToken"},
-      // TODO: Diseñar guardado del token
       body: {
         'firstName': user.givenName,
         'lastName': user.familyName,
@@ -72,7 +67,7 @@ class UserRepository {
       _apiConfig.getUniqueResourceUri("users", id.toString()),
       headers: {
         'Authorization': "Bearer $accessToken"
-      }, // TODO: Diseñar guardado del token
+      },
     );
 
     return json.decode(response.body) as Map<String, dynamic>;

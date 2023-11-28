@@ -48,8 +48,6 @@ class AuthenticationService {
     await prefs.clear();
     await prefs.setString('token', token);
     await prefs.setInt('id', id);
-
-    print("Saved: ${prefs.getString("token")}");
   }
 
   Future<void> logout() async {

@@ -26,6 +26,7 @@ class _LoginCheckState extends State<LoginCheck> {
   void _loadUserInfo() async {
     try {
       var user = await _authenticationService.checkSharedPrefs();
+
       if (!context.mounted) return;
 
       BlocProvider.of<UserCubit>(context).login(user);
@@ -35,8 +36,12 @@ class _LoginCheckState extends State<LoginCheck> {
           builder: (context) => const MainLayout(),
         ),
       );
-    } catch (e) {
-      showLogoutNotification(context);
+    } on Exception catch(e, s) {
+      print(s);
+      showLogoutNotification(context, false);
+    } catch (e, s) {
+      print(s);
+      showLogoutNotification(context, false);
     }
   }
 
@@ -45,19 +50,21 @@ class _LoginCheckState extends State<LoginCheck> {
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 
-  static Widget showLogoutNotification(BuildContext context) =>
-      _showNotification(context, 'Sesión Cerrada', 'Su sesión ha sido cerrada');
+  Widget showLogoutNotification(BuildContext context, bool effectiveLogout) =>
+      _showNotification(context, 'Sesión Cerrada', 'Su sesión ha sido cerrada', effectiveLogout);
 
-  static Widget _showNotification(
-      BuildContext context, String title, String message) {
+  Widget _showNotification(
+      BuildContext context, String title, String message, bool effectiveLogout) {
     AlertDialog dialog = AlertDialog(
       title: Text(title),
       content: Text(message),
       actions: [
         TextButton(
           onPressed: () {
-            AuthenticationService().logout();
-            BlocProvider.of<UserCubit>(context).logout();
+            if (effectiveLogout) {
+              _authenticationService.logout();
+              BlocProvider.of<UserCubit>(context).logout();
+            }
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
